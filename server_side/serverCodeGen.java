@@ -123,8 +123,8 @@ public class serverCodeGen {
       pr.println("default:");
       pr.println("parameterTypes[p] = Class.forName(marsh[4+i*3]);");//CH
       pr.println("byte b[] = marsh[5+i*3].getBytes();");//CH
-      pr.println("ByteArrayInputStream bais = new ByteArrayInputStream(b);");
-      pr.println("ObjectInputStream ois = new ObjectInputStream(bais);");
+      pr.println("ByteArrayInputStream BIS = new ByteArrayInputStream(b);");
+      pr.println("ObjectInputStream ois = new ObjectInputStream(BIS);");
       pr.println("param[p] = ois.readObject();");
 
       pr.println("}"); // END OF SWITCH-CASE
@@ -132,7 +132,20 @@ public class serverCodeGen {
 
       pr.println("}"); // END OF FOR
       pr.println("Method m=c.getDeclaredMethod(marsh[2], parameterTypes);"); //CH
-      pr.println("m.invoke(obj,param);");
+      pr.println("Object answer = m.invoke(obj,param);\n");
+
+      /////////////////RETURNING THE ANSWER ////////////////////////////
+
+      pr.println("try{\n");
+        pr.println("Socket sc=new Socket(\"localhost\",8000);\n");
+        pr.println("DataOutputStream dout=new DataOutputStream(sc.getOutputStream());\n");
+        pr.println("dout.writeUTF("+"(answer).toString()"+");\n");
+        pr.println("dout.flush();\n");
+        pr.println("dout.close();\n");
+        pr.println("sc.close();\n");
+      pr.println("}catch(Exception e){System.out.println(e);}");
+
+      //////////////////////////////////////////////////////////////////
       pr.println("}");
       pr.println("} catch (Exception e) {");
       pr.println("System.out.println(e);");

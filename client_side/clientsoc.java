@@ -54,7 +54,7 @@ public class clientsoc {
 
 	    		//// WRITING FUNCTION SIGNATURE /////////////////////
 
-	    		to_write = "public "+functions[1].getReturnType()+" "+functions[i].getName()+"(";
+	    		to_write = "public "+functions[i].getReturnType()+" "+functions[i].getName()+"(";
 
 	    		int no_of_para = functions[i].getParameterCount();
 	    		Parameter[] para = functions[i].getParameters();
@@ -108,9 +108,44 @@ public class clientsoc {
 
 	    		// END OF SOCKET CODE
 
-	    		pr.println(to_write);
+          pr.println(to_write);
 
-	    		to_write = "}\n catch(Exception e)\n{\nSystem.out.println(e);\n}";
+          // FETCHING THE RESULT
+
+          pr.println("ServerSocket ss=new ServerSocket(8000);\n");
+          pr.println("Socket s1=ss.accept();\n");
+          pr.println("DataInputStream DIS=new DataInputStream(s1.getInputStream());\n");
+          pr.println("String  str1=(String)DIS.readUTF();\n");
+          pr.println("ss.close();");
+
+          /////////////////////// PARSING ACCORDING TO RETURN TYPE ///////////////////////
+          System.out.println(functions[i].getReturnType().toString());
+          if(((functions[i].getReturnType()).toString()).equals("int"))
+          {
+          pr.println("return (Integer.parseInt(str1));\n");
+          }
+
+          else if(((functions[i].getReturnType()).toString()).equals("char"))
+          pr.println("return ((char)Integer.parseInt(str1));\n");
+
+          else if(((functions[i].getReturnType()).toString()).equals("float"))
+          pr.println("return (Float.parseFloat(str1));\n");
+
+          else if(((functions[i].getReturnType()).toString()).equals("double"))
+          pr.println("return (Double.parseDouble(str1));\n");
+
+          //ELSE PARSE IN BTYE STREAM
+          else{
+          pr.println("byte b[] = str1.getBytes();");
+          pr.println("ByteArrayInputStream BIS = new ByteArrayInputStream(b);");
+          pr.println("ObjectInputStream ois = new ObjectInputStream(BIS);");
+          pr.println("return(ois.readObject());");
+        }
+
+          ///////////////////////////////////////////////////////////////////////////////
+
+
+	    		to_write = "}\n catch(Exception e)\n{\nSystem.out.println(e);\nreturn 0;}";
 
 	    		pr.println(to_write);
 
